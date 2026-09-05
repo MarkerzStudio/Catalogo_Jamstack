@@ -1,0 +1,31 @@
+name: Actualizar Catálogo del Cliente
+on:
+  repository_dispatch:
+    types: [webhook_actualizar_web]
+
+jobs:
+  generar-y-subir:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v3
+
+      - name: Instalar Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Generar datos.json desde el CSV del cliente
+        run: node scripts/generar-datos.js
+        env:
+          CSV_URL: ${{ github.event.client_payload.csv_url }}
+          TELEFONO: ${{ github.event.client_payload.telefono }}
+
+      - name: Subir datos.json a Hostinger vía FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER_HOSTINGER }}
+          username: ${{ secrets.FTP_USERNAME_HOSTINGER }}
+          password: ${{ secrets.FTP_PASSWORD_HOSTINGER }}
+          local-dir: ./output/
+          server-dir: ./${{ github.event.client_payload.cliente_id }}/public_html/

@@ -1,0 +1,21 @@
+# Output generado en cada ejecución (no se sube al repo)
+output/
+
+# Entorno local de pruebas
+.env
+.env.production
+
+# Dependencias (no aplica aquí, pero por si acaso)
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# macOS
+.DS_Store
+
+# Editor
+.idea/
+.vscode/

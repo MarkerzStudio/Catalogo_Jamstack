@@ -1,0 +1,9 @@
+{
+  "name": "catalogo-pipeline",
+  "version": "1.0.0",
+  "description": "Pipeline centralizado para actualizar catálogos desde Google Sheets a Hostinger vía FTP",
+  "type": "module",
+  "scripts": {
+    "generar": "node scripts/generar-datos.js"
+  }
+}
