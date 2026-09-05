@@ -18,8 +18,9 @@ jobs:
       - name: Generar datos.json desde el CSV del cliente
         run: node scripts/generar-datos.js
         env:
-          CSV_URL: ${{ github.event.client_payload.csv_url }}
+          TSV_URL: ${{ github.event.client_payload.tsv_url }}
           TELEFONO: ${{ github.event.client_payload.telefono }}
+          TIPO_CAMBIO: ${{ github.event.client_payload.tipo_cambio }}
 
       - name: Subir datos.json a Hostinger vía FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4

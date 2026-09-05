@@ -7,7 +7,7 @@ Pipeline centralizado que convierte cualquier catálogo de Google Sheets en un a
 Cuando el dueño de un negocio presiona el botón "Publicar" en su Google Sheets, este sistema:
 
 1. Recibe un webhook desde Google Apps Script
-2. Descarga el inventario en formato CSV
+2. Descarga el inventario en formato **TSV (Tab-Separated Values)** para soportar comas en los textos.
 3. Lo convierte a un archivo `datos.json` limpio y ligero
 4. Lo sube por FTP a la carpeta del cliente en Hostinger
 
@@ -28,27 +28,46 @@ sheets-sync/
 
 ## Formato del Google Sheets
 
-El archivo de inventario del cliente debe tener estas columnas en orden:
+El archivo de inventario del cliente debe tener estas **10 columnas** exactas, en este orden:
 
-| A — id | B — nombre | C — precio | D — descripcion | E — url_imagen |
-|--------|------------|------------|-----------------|----------------|
-| 1      | Arroz 1kg  | 8.50       | Arroz blanco    | https://...    |
+| Columna | Nombre | Ejemplo | Descripción |
+| :--- | :--- | :--- | :--- |
+| **A** | **ID** | `LAP-001` | Código interno (SKU). |
+| **B** | **Nombre** | `Laptop Dell` | Título del producto. Obligatorio. |
+| **C** | **Precio USD** | `1250.00` | Precio en dólares (número puro). |
+| **D** | **Categoría** | `Laptops` | Para filtros visuales. |
+| **E** | **Descripción** | `Notebook ultraligera...` | Texto libre. |
+| **F** | **Imagen** | `https://...` | URL de la foto. |
+| **G** | **Marca** | `Dell` | (Opcional) Filtro por marcas. |
+| **H** | **Unidad** | `1 un.` | (Opcional) Ej: Litro, Caja, Kg. |
+| **I** | **Destacado** | `SI` o `NO` | (Opcional) Para el inicio/ofertas. |
+| **J** | **Atributos** | `16GB RAM\|512GB SSD` | (Opcional) Specs separados por `\|`. |
 
-> ⚠️ El precio debe ser un número puro (sin símbolo de moneda ni puntos de miles). Las descripciones no deben contener comas.
+> 💡 **Formato TSV:** El archivo se descarga como TSV (separado por tabulaciones), lo que significa que el dueño puede usar todas las comas (`,`) que quiera en las descripciones sin romper el sistema.
 
 ## Formato de datos.json generado
 
 ```json
 {
   "telefono": "591XXXXXXXXX",
+  "tipo_cambio": 6.96,
   "actualizado": "2026-09-05T19:17:18.183Z",
   "productos": [
     {
-      "id": "1",
-      "nombre": "Arroz 1kg",
-      "precio": 8.5,
-      "descripcion": "Arroz blanco de primera",
-      "imagen": "https://..."
+      "id": "LAP-001",
+      "nombre": "Laptop Dell",
+      "precio_usd": 1250,
+      "precio_bs": 8700,
+      "categoria": "Laptops",
+      "descripcion": "Notebook ultraligera...",
+      "imagen": "https://...",
+      "marca": "Dell",
+      "unidad": "1 un.",
+      "destacado": true,
+      "atributos": [
+        "16GB RAM",
+        "512GB SSD"
+      ]
     }
   ]
 }
@@ -59,8 +78,9 @@ El archivo de inventario del cliente debe tener estas columnas en orden:
 ### Pruebas locales (`.env`)
 
 ```env
-CSV_URL=https://docs.google.com/spreadsheets/d/TU_ID/pub?output=csv
+TSV_URL=https://docs.google.com/spreadsheets/d/TU_ID/pub?output=tsv
 TELEFONO=591XXXXXXXXX
+TIPO_CAMBIO=6.96
 ```
 
 Ejecutar localmente:
@@ -82,8 +102,9 @@ El script del cliente envía estos datos al activar el pipeline:
 
 ```javascript
 "client_payload": {
-  "csv_url":    "URL pública del CSV del cliente",
+  "tsv_url":    "URL pública del TSV del cliente (publicado como TSV)",
   "telefono":   "Número de WhatsApp del negocio",
+  "tipo_cambio": "6.96",
   "cliente_id": "nombre-de-su-dominio.com"  // define la carpeta en Hostinger
 }
 ```
